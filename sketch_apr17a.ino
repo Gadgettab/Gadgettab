@@ -1,77 +1,81 @@
-#include <UTFT.h>
-#include <URTouch.h>
+#include <Servo.h>
 
-UTFT myGLCD(TFT01_22SP, 8, 9, 12, 11, 10);
-URTouch  myTouch( 6, 5, 4, 3, 2);
+#define pot_1 A0
+#define pot_2 A1
+#define pot_3 A2
+#define pot_4 A3
 
-bool flag = 1;
-int x = 0;
-int y = 0;
+#define but_pin 10
+
+Servo servo_1;
+Servo servo_2;
+Servo servo_3;
+Servo servo_4;
+
+int servo_1_pin = 6;
+int servo_2_pin = 7;
+int servo_3_pin = 8;
+int servo_4_pin = 9;
+
+int angle_1;
+int angle_2;
+int angle_3;
+int angle_4;
+
+int buf_angle_1;
+int buf_angle_2;
+int buf_angle_3;
+int buf_angle_4;
 
 void setup() {
-  myTouch.InitTouch(PORTRAIT);
-  myTouch.setPrecision(PREC_HI);
-  myGLCD.InitLCD(0);
-  // очищаем экран
-  myGLCD.clrScr();
+  pinMode(pot_1, INPUT);
+  pinMode(pot_2, INPUT);
+  pinMode(pot_3, INPUT);
+  pinMode(pot_4, INPUT);
 
-  myGLCD.setColor(0, 0, 0);
-  // вывод закрашенного прямоугольника
-  myGLCD.fillRect(1, 1, 240, 320);
-  myGLCD.setColor(0, 0, 255);
+  servo_1.attach(servo_1_pin);
+  servo_2.attach(servo_2_pin);
+  servo_3.attach(servo_3_pin);
+  servo_4.attach(servo_4_pin);
 
-  myGLCD.fillRect(20, 20, 100, 100);
-  myGLCD.fillRect(140, 20, 220, 100);
-
-  myGLCD.fillRect(20, 120, 100, 200);
-  myGLCD.fillRect(140, 120, 220, 200);
-
-  myGLCD.fillRect(20, 220, 100, 300);
-  myGLCD.fillRect(140, 220, 220, 300);
   Serial.begin(9600);
 }
 
 void loop() {
-  bool i = myTouch.dataAvailable();
-  if (i) {
-    myTouch.read();                 // Запускаем процесс определения координат точки касания.
-    //Serial.print("X=");
-    x = myTouch.getX();
-    //Serial.print(x);   // Получаем и выводим в монитор последовательного порта координату касания по оси X
-    //Serial.print(", Y=");
-    y = myTouch.getY();
-    //Serial.print(y);   // Получаем и выводим в монитор последовательного порта координату касания по оси Y
-    //Serial.println(".");
 
-    if (flag) {
-      flag = 0;
-      if (x > 20 & x<100 & y>20 & y < 100) {
-        Serial.println("1-st button presed");
-        delay(100);
-      }
-      else if (x > 140 & x<220 & y>20 & y < 100) {
-        Serial.println("2-nd button presed");
-        delay(100);
-      }
-      else if (x > 20 & x<100 & y>120 & y < 200) {
-        Serial.println("3-d button presed");
-        delay(100);
-      }
-      else if (x > 140 & x<220 & y>120 & y < 200) {
-        Serial.println("4-th button presed");
-        delay(100);
-      }
-      else if (x > 20 & x<100 & y>220 & y < 300) {
-        Serial.println("5-th button presed");
-        delay(100);
-      }
-      else if (x > 140 & x<220 & y>220 & y < 300) {
-        Serial.println("6-th button presed");
-        delay(100);
-      }
-    }
+  angle_1 = map(analogRead(pot_1), 0, 1023, 0, 180);
+  angle_2 = map(analogRead(pot_2), 0, 1023, 160, 80 );
+  angle_3 = map(analogRead(pot_3), 0, 1023, 34, 110);
+  angle_4 = map(analogRead(pot_4), 0, 1023, 0, 180);
+  
+  servo_1.write(angle_1);
+  servo_2.write(angle_2);
+  servo_3.write(angle_3);
+  servo_4.write(angle_4);
+
+  Serial.print(angle_1);
+  Serial.print("/t");
+  Serial.print(angle_2);
+  Serial.print("/t");
+  Serial.print(angle_3);
+  Serial.print("/t");
+  Serial.print(angle_4);
+  erial.print("/t");
+  Serial.print(analogRead(A4));
+  Serial.println();
+  delay(15);
+
+  if (analogRead(A4) <= 300){
+    digitalWrite(11, HIGH);
+    digitalWrite(12, LOW);
+   
   }
-  else {
-    flag = 1;
+  else if(analogRead(A4) >= 900){
+    digitalWrite(11, LOW);
+    digitalWrite(12, HIGH);
   }
+  else{
+    digitalWrite(11, LOW);
+    digitalWrite(12, LOW);
+}
 }
